@@ -25,12 +25,21 @@ pipeline {
                 }
             }
         }
-		
+  stage('Setup Permissions') {
+            steps {
+                script {
+                    // Change permissions so the user can deploy without sudo each time
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubunu@${APP_SERVER_IP} "sudo chmod -R 775 /var/www/html && sudo chown -R ubuntu:${APP_SERVER_IP} /var/www/html"
+                    '''
+                }
+            }
+        }	
       stage('Deploy application') {
             steps {
                 sshagent(['ec2-ssh-key']) { 
                     sh """
-                    scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r * ubuntu@${APP_SERVER_IP}:/var/www/html/
+                    scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r index.html ubuntu@${APP_SERVER_IP}:/var/www/html/
                     ssh -i ${SSH_KEY} ubuntu@${APP_SERVER_IP} 'sudo systemctl restart apache2'
                     """
                 }
