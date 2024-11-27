@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        APP_SERVER_IP = 'WEB_SERVER_IP' // Replace with your web server IP
-        SSH_KEY = credentials('SSH_KEY_ID') // Replace with the ID of your Jenkins SSH key
+        APP_SERVER_IP = '54.176.154.38' // Replace with Web Server IP
+        SSH_KEY = credentials('web_app_id)
     }
 
     stages {
@@ -12,26 +12,26 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Kchaubey/WEBAPPLICATION.git'
             }
         }
-
-        stage('Build') {
+    stage('Setup Web Server') {
             steps {
-                // Add your build steps here if needed, e.g., npm install, mvn package, etc.
-                echo "Build completed!"
-            }
-        }
-
-        stage('Test') {
-            steps {
-                // Add testing steps if any
-                echo "Tests passed!"
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sshagent(['SSH_KEY_ID']) { // Jenkins SSH credentials ID
+                sshagent(['web_app_id']) {
                     sh """
-                    scp -o StrictHostKeyChecking=no -r * ubuntu@${APP_SERVER_IP}:/var/www/html/
+                    ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubuntu@${APP_SERVER_IP} '
+                    sudo apt update &&
+                    sudo apt install apache2 -y &&
+                    sudo systemctl start apache2 &&
+                    sudo systemctl enable apache2'
+                    """
+                }
+            }
+        }
+		
+      stage('Deploy application') {
+            steps {
+                sshagent(['web_app_id']) { 
+                    sh """
+                    scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r * ubuntu@${APP_SERVER_IP}:/var/www/html/
+                    ssh -i ${SSH_KEY} ubuntu@${APP_SERVER_IP} 'sudo systemctl restart apache2'
                     """
                 }
             }
