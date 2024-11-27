@@ -30,7 +30,7 @@ pipeline {
                 script {
                     // Change permissions so the user can deploy without sudo each time
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubunu@${APP_SERVER_IP} "sudo chmod -R 775 /var/www/html && sudo chown -R ubuntu:${APP_SERVER_IP} /var/www/html"
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubuntu@${APP_SERVER_IP} "sudo chmod -R 775 /var/www/html && sudo chown -R ubuntu:${APP_SERVER_IP} /var/www/html"
                     '''
                 }
             }
