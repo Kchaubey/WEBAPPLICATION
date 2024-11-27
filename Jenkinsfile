@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_SERVER_IP = '54.176.154.38' // Replace with Web Server IP
-        SSH_KEY = credentials('web_app_id')
+        SSH_KEY = credentials('ec2-ssh-key')
     }
 
     stages {
@@ -14,7 +14,7 @@ pipeline {
         }
     stage('Setup Web Server') {
             steps {
-                sshagent(['web_app_id']) {
+                sshagent(['ec2-ssh-key']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubuntu@${APP_SERVER_IP} '
                     sudo apt update &&
@@ -28,7 +28,7 @@ pipeline {
 		
       stage('Deploy application') {
             steps {
-                sshagent(['web_app_id']) { 
+                sshagent(['ec2-ssh-key']) { 
                     sh """
                     scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r * ubuntu@${APP_SERVER_IP}:/var/www/html/
                     ssh -i ${SSH_KEY} ubuntu@${APP_SERVER_IP} 'sudo systemctl restart apache2'
