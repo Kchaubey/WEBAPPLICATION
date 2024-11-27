@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_SERVER_IP = '54.176.154.38' // Replace with Web Server IP
-        SSH_KEY = credentials('web_app_id)
+        SSH_KEY = credentials('web_app_id')
     }
 
     stages {
